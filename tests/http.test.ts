@@ -114,7 +114,7 @@ describe("createTracedClient", () => {
     const [, options] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(options.method).toBe("POST");
     expect(options.body).toBe('{"name":"test"}');
-    expect(options.headers["Content-Type"]).toBe("application/json");
+    expect(options.headers.get("Content-Type")).toBe("application/json");
   });
 
   it("should send PUT request", async () => {
