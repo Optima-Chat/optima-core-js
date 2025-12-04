@@ -97,8 +97,8 @@ export async function runHealthChecks(
 export function createHealthHandler(options: {
   serviceName: string;
   checks?: HealthChecks;
-}) {
-  return async function GET() {
+}): () => Promise<Response> {
+  return async function GET(): Promise<Response> {
     const result = await runHealthChecks(
       options.serviceName,
       options.checks || {}

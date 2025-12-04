@@ -2,7 +2,7 @@
  * 调试端点模块
  */
 
-import { getCachedBuildInfo, type BuildInfo } from "../config/build-info";
+import { getCachedBuildInfo } from "../config/build-info";
 
 // 启动时间
 const startTime = Date.now();
@@ -134,8 +134,10 @@ export function validateDebugKey(request: Request): boolean {
  * import { createDebugInfoHandler } from '@optima/core/diagnostics';
  * export const GET = createDebugInfoHandler();
  */
-export function createDebugInfoHandler(options?: { requireKey?: boolean }) {
-  return async function GET(request: Request) {
+export function createDebugInfoHandler(options?: { requireKey?: boolean }): (
+  request: Request
+) => Promise<Response> {
+  return async function GET(request: Request): Promise<Response> {
     if (options?.requireKey && !validateDebugKey(request)) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -156,8 +158,8 @@ export function createDebugInfoHandler(options?: { requireKey?: boolean }) {
  */
 export function createDebugConfigHandler(options?: {
   allowedPrefixes?: string[];
-}) {
-  return async function GET(request: Request) {
+}): (request: Request) => Promise<Response> {
+  return async function GET(request: Request): Promise<Response> {
     if (!validateDebugKey(request)) {
       return Response.json(
         { error: "Unauthorized - X-Debug-Key required" },
