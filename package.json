@@ -14,19 +14,23 @@
     },
     "./diagnostics": {
       "types": "./dist/diagnostics/index.d.ts",
-      "import": "./dist/diagnostics/index.js"
+      "import": "./dist/diagnostics/index.js",
+      "require": "./dist/diagnostics/index.cjs"
     },
     "./logging": {
       "types": "./dist/logging/index.d.ts",
-      "import": "./dist/logging/index.js"
+      "import": "./dist/logging/index.js",
+      "require": "./dist/logging/index.cjs"
     },
     "./tracing": {
       "types": "./dist/tracing/index.d.ts",
-      "import": "./dist/tracing/index.js"
+      "import": "./dist/tracing/index.js",
+      "require": "./dist/tracing/index.cjs"
     },
     "./http": {
       "types": "./dist/http/index.d.ts",
-      "import": "./dist/http/index.js"
+      "import": "./dist/http/index.js",
+      "require": "./dist/http/index.cjs"
     }
   },
   "files": [
