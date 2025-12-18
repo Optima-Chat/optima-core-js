@@ -1,6 +1,6 @@
 {
-  "name": "@optima/core",
-  "version": "0.1.0",
+  "name": "@optima-chat/observability",
+  "version": "0.3.1",
   "description": "Optima 生产可观测性共享库 - 诊断、日志、追踪 (Next.js/Node.js)",
   "type": "module",
   "main": "./dist/index.js",
@@ -8,29 +8,54 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./diagnostics": {
-      "types": "./dist/diagnostics/index.d.ts",
-      "import": "./dist/diagnostics/index.js",
-      "require": "./dist/diagnostics/index.cjs"
+      "import": {
+        "types": "./dist/diagnostics/index.d.ts",
+        "default": "./dist/diagnostics/index.js"
+      },
+      "require": {
+        "types": "./dist/diagnostics/index.d.cts",
+        "default": "./dist/diagnostics/index.cjs"
+      }
     },
     "./logging": {
-      "types": "./dist/logging/index.d.ts",
-      "import": "./dist/logging/index.js",
-      "require": "./dist/logging/index.cjs"
+      "import": {
+        "types": "./dist/logging/index.d.ts",
+        "default": "./dist/logging/index.js"
+      },
+      "require": {
+        "types": "./dist/logging/index.d.cts",
+        "default": "./dist/logging/index.cjs"
+      }
     },
     "./tracing": {
-      "types": "./dist/tracing/index.d.ts",
-      "import": "./dist/tracing/index.js",
-      "require": "./dist/tracing/index.cjs"
+      "import": {
+        "types": "./dist/tracing/index.d.ts",
+        "default": "./dist/tracing/index.js"
+      },
+      "require": {
+        "types": "./dist/tracing/index.d.cts",
+        "default": "./dist/tracing/index.cjs"
+      }
     },
     "./http": {
-      "types": "./dist/http/index.d.ts",
-      "import": "./dist/http/index.js",
-      "require": "./dist/http/index.cjs"
+      "import": {
+        "types": "./dist/http/index.d.ts",
+        "default": "./dist/http/index.js"
+      },
+      "require": {
+        "types": "./dist/http/index.d.cts",
+        "default": "./dist/http/index.cjs"
+      }
     }
   },
   "files": [
