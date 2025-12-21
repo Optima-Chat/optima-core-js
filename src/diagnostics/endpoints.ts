@@ -26,8 +26,11 @@ export interface DebugInfoResponse {
 
 export interface DebugConfigResponse {
   config: Record<string, string>;
+  /** 构建时内联的环境变量（如 Next.js 的 NEXT_PUBLIC_*） */
+  buildTimeConfig?: Record<string, string>;
   infisicalEnabled: boolean;
   configSource: string;
+  environment: string;
 }
 
 /**
@@ -89,7 +92,8 @@ function maskValue(key: string, value: string): string {
  * 获取脱敏后的配置
  */
 export function getDebugConfig(
-  allowedPrefixes: string[] = ["DATABASE", "REDIS", "OAUTH", "CORS", "API"]
+  allowedPrefixes: string[] = ["DATABASE", "REDIS", "OAUTH", "CORS", "API"],
+  buildTimeEnv?: Record<string, string | undefined>
 ): DebugConfigResponse {
   const config: Record<string, string> = {};
 
@@ -106,10 +110,23 @@ export function getDebugConfig(
     }
   }
 
+  // 处理构建时内联的环境变量
+  let buildTimeConfig: Record<string, string> | undefined;
+  if (buildTimeEnv) {
+    buildTimeConfig = {};
+    for (const [key, value] of Object.entries(buildTimeEnv)) {
+      if (value) {
+        buildTimeConfig[key] = maskValue(key, value);
+      }
+    }
+  }
+
   return {
     config,
+    buildTimeConfig,
     infisicalEnabled: !!process.env.INFISICAL_CLIENT_ID,
     configSource: process.env.INFISICAL_CLIENT_ID ? "infisical" : "env",
+    environment: process.env.NODE_ENV || "development",
   };
 }
 
@@ -152,12 +169,26 @@ export function createDebugInfoHandler(options?: { requireKey?: boolean }): (
  * 创建 /debug/config 端点处理器
  *
  * @example
- * // app/api/debug/config/route.ts
+ * // app/api/debug/config/route.ts (Node.js 服务)
  * import { createDebugConfigHandler } from '@optima/core/diagnostics';
  * export const GET = createDebugConfigHandler();
+ *
+ * @example
+ * // app/api/debug/config/route.ts (Next.js 服务，需要展示构建时内联的 NEXT_PUBLIC_* 变量)
+ * import { createDebugConfigHandler } from '@optima/core/diagnostics';
+ * export const GET = createDebugConfigHandler({
+ *   allowedPrefixes: ['DATABASE', 'MCP', 'NEXT_PUBLIC'],
+ *   // 构建时内联的值（webpack 会在构建时替换 process.env.NEXT_PUBLIC_*）
+ *   buildTimeEnv: {
+ *     NEXT_PUBLIC_SHOP_DOMAIN: process.env.NEXT_PUBLIC_SHOP_DOMAIN,
+ *     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+ *   }
+ * });
  */
 export function createDebugConfigHandler(options?: {
   allowedPrefixes?: string[];
+  /** 构建时内联的环境变量，用于 Next.js 等在构建时替换 process.env 的框架 */
+  buildTimeEnv?: Record<string, string | undefined>;
 }): (request: Request) => Promise<Response> {
   return async function GET(request: Request): Promise<Response> {
     if (!validateDebugKey(request)) {
@@ -167,8 +198,11 @@ export function createDebugConfigHandler(options?: {
       );
     }
 
-    return Response.json(getDebugConfig(options?.allowedPrefixes), {
-      headers: { "Cache-Control": "no-store" },
-    });
+    return Response.json(
+      getDebugConfig(options?.allowedPrefixes, options?.buildTimeEnv),
+      {
+        headers: { "Cache-Control": "no-store" },
+      }
+    );
   };
 }

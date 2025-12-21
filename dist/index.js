@@ -114,7 +114,7 @@ function maskValue(key, value) {
   }
   return value;
 }
-function getDebugConfig(allowedPrefixes = ["DATABASE", "REDIS", "OAUTH", "CORS", "API"]) {
+function getDebugConfig(allowedPrefixes = ["DATABASE", "REDIS", "OAUTH", "CORS", "API"], buildTimeEnv) {
   const config = {};
   for (const [key, value] of Object.entries(process.env)) {
     if (!value) continue;
@@ -125,10 +125,21 @@ function getDebugConfig(allowedPrefixes = ["DATABASE", "REDIS", "OAUTH", "CORS",
       config[key] = maskValue(key, value);
     }
   }
+  let buildTimeConfig;
+  if (buildTimeEnv) {
+    buildTimeConfig = {};
+    for (const [key, value] of Object.entries(buildTimeEnv)) {
+      if (value) {
+        buildTimeConfig[key] = maskValue(key, value);
+      }
+    }
+  }
   return {
     config,
+    buildTimeConfig,
     infisicalEnabled: !!process.env.INFISICAL_CLIENT_ID,
-    configSource: process.env.INFISICAL_CLIENT_ID ? "infisical" : "env"
+    configSource: process.env.INFISICAL_CLIENT_ID ? "infisical" : "env",
+    environment: process.env.NODE_ENV || "development"
   };
 }
 function validateDebugKey(request) {
@@ -157,9 +168,12 @@ function createDebugConfigHandler(options) {
         { status: 401 }
       );
     }
-    return Response.json(getDebugConfig(options?.allowedPrefixes), {
-      headers: { "Cache-Control": "no-store" }
-    });
+    return Response.json(
+      getDebugConfig(options?.allowedPrefixes, options?.buildTimeEnv),
+      {
+        headers: { "Cache-Control": "no-store" }
+      }
+    );
   };
 }
 var asyncLocalStorage = new AsyncLocalStorage();
